@@ -20,10 +20,14 @@ function parseAndValidatePuzzle(emptyPuzzle, words) {
             if (grid[r][c] !== '.') totalSlots += parseInt(grid[r][c]);
         }
     }
+
+    if (totalSlots !== words.length) return null;
+
+    return { grid, height, width };
 }
     
     //logic for path detection
-   function detectWordPaths(grid, height, width) {
+function detectWordPaths(grid, height, width) {
     const paths = [];
     for (let r = 0; r < height; r++) {
         for (let c = 0; c < width; c++) {
@@ -123,3 +127,12 @@ function crosswordSolver(emptyPuzzle, words) {
         console.log(solutions[0]);
     }
 }
+
+// Module export for Jest unit testing
+module.exports = { 
+    crosswordSolver,
+    parseAndValidatePuzzle,
+    detectWordPaths,
+    canPlaceWord,
+    runBacktrackingSolver
+};
