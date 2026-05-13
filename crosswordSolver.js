@@ -52,7 +52,6 @@ function crosswordSolver(emptyPuzzle, words) {
         }
     }
 
-}
 //implement recursive solver with backtracking
     const solutions = [];
     const usedWords = new Array(words.length).fill(false);
@@ -98,3 +97,19 @@ function crosswordSolver(emptyPuzzle, words) {
             }
         }
     }
+        solve(0);
+
+    if (solutions.length !== 1) {
+        console.log('Error');
+    } else {
+        console.log(solutions[0]);
+    }
+    
+} 
+const emptyPuzzle = `2001
+0..0
+1000
+0..0`;
+const words = ["casa", "alan", "ciao", "anta"];
+
+crosswordSolver(emptyPuzzle, words);
