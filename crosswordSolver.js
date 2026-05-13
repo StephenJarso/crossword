@@ -53,3 +53,48 @@ function crosswordSolver(emptyPuzzle, words) {
     }
 
 }
+//implement recursive solver with backtracking
+    const solutions = [];
+    const usedWords = new Array(words.length).fill(false);
+
+    function solve(pathIdx) {
+        if (pathIdx === paths.length) {
+            solutions.push(grid.map(row => row.join('')).join('\n'));
+            return;
+        }
+
+        const { r, c, len, dir } = paths[pathIdx];
+        for (let i = 0; i < words.length; i++) {
+            if (usedWords[i] || words[i].length !== len) continue;
+
+            const word = words[i];
+            const originalChars = [];
+            let canPlace = true;
+
+            // Check if word fits with letters already on the board
+            for (let j = 0; j < len; j++) {
+                const currR = dir === 'H' ? r : r + j;
+                const currC = dir === 'H' ? c + j : c;
+                if (/[a-z]/.test(grid[currR][currC]) && grid[currR][currC] !== word[j]) {
+                    canPlace = false;
+                    break;
+                }
+                originalChars.push(grid[currR][currC]);
+            }
+
+            if (canPlace) {
+                for (let j = 0; j < len; j++) {
+                    grid[dir === 'H' ? r : r + j][dir === 'H' ? c + j : c] = word[j];
+                }
+                usedWords[i] = true;
+                solve(pathIdx + 1);
+                
+                // Backtrack
+                usedWords[i] = false;
+                for (let j = 0; j < len; j++) {
+                    grid[dir === 'H' ? r : r + j][dir === 'H' ? c + j : c] = originalChars[j];
+                }
+                if (solutions.length > 1) return; 
+            }
+        }
+    }
