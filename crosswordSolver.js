@@ -1,22 +1,15 @@
 // crosswordSolver.js - Part 1
-function crosswordSolver(emptyPuzzle, words) {
-    if (typeof emptyPuzzle !== 'string' || !Array.isArray(words)) {
-        console.log('Error');
-        return;
-    }
+// function crosswordSolver(emptyPuzzle, words) {
+function parseAndValidatePuzzle(emptyPuzzle, words) {
+    if (typeof emptyPuzzle !== 'string' || !Array.isArray(words)) return null;
+    if (new Set(words).size !== words.length) return null;
 
     const lines = emptyPuzzle.split('\n');
     const height = lines.length;
-    const width = lines[0].length;
+    const width = lines[0] ? lines[0].length : 0;
 
-    if (!lines.every(line => line.length === width && /^[012.]+$/.test(line))) {
-        console.log('Error');
-        return;
-    }
-
-    if (new Set(words).size !== words.length) {
-        console.log('Error');
-        return;
+    if (width === 0 || !lines.every(line => line.length === width && /^[012.]+$/.test(line))) {
+        return null;
     }
 
     const grid = lines.map(line => line.split(''));
@@ -28,10 +21,7 @@ function crosswordSolver(emptyPuzzle, words) {
         }
     }
 
-    if (totalSlots !== words.length) {
-        console.log('Error');
-        return;
-    }
+    
     //logic for path detection
     const paths = [];
     for (let r = 0; r < height; r++) {
