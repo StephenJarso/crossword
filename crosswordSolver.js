@@ -20,7 +20,7 @@ function parseAndValidatePuzzle(emptyPuzzle, words) {
             if (grid[r][c] !== '.') totalSlots += parseInt(grid[r][c]);
         }
     }
-
+}
     
     //logic for path detection
    function detectWordPaths(grid, height, width) {
@@ -46,8 +46,23 @@ function parseAndValidatePuzzle(emptyPuzzle, words) {
     }
     return paths;
 }
+function canPlaceWord(grid, path, word) {
+    if (word.length !== path.len) return false;
 
-//implement recursive solver with backtracking
+    for (let j = 0; j < path.len; j++) {
+        const currR = path.dir === 'H' ? path.r : path.r + j;
+        const currC = path.dir === 'H' ? path.c + j : path.c;
+        const currentCell = grid[currR][currC];
+
+        // If the cell already contains a letter, it must match the word's letter
+        if (/[a-z]/.test(currentCell) && currentCell !== word[j]) {
+            return false;
+        }
+    }
+    return true;
+}
+
+function runBacktrackingSolver(grid, paths, words) {
     const solutions = [];
     const usedWords = new Array(words.length).fill(false);
 
@@ -57,54 +72,36 @@ function parseAndValidatePuzzle(emptyPuzzle, words) {
             return;
         }
 
-        const { r, c, len, dir } = paths[pathIdx];
+        const path = paths[pathIdx];
         for (let i = 0; i < words.length; i++) {
-            if (usedWords[i] || words[i].length !== len) continue;
+            if (usedWords[i]) continue;
 
             const word = words[i];
-            const originalChars = [];
-            let canPlace = true;
+            if (!canPlaceWord(grid, path, word)) continue;
 
-            // Check if word fits with letters already on the board
-            for (let j = 0; j < len; j++) {
-                const currR = dir === 'H' ? r : r + j;
-                const currC = dir === 'H' ? c + j : c;
-                if (/[a-z]/.test(grid[currR][currC]) && grid[currR][currC] !== word[j]) {
-                    canPlace = false;
-                    break;
-                }
+            // Save state for backtracking
+            const originalChars = [];
+            for (let j = 0; j < path.len; j++) {
+                const currR = path.dir === 'H' ? path.r : path.r + j;
+                const currC = path.dir === 'H' ? path.c + j : path.c;
                 originalChars.push(grid[currR][currC]);
+                grid[currR][currC] = word[j]; // Place letter
             }
 
-            if (canPlace) {
-                for (let j = 0; j < len; j++) {
-                    grid[dir === 'H' ? r : r + j][dir === 'H' ? c + j : c] = word[j];
-                }
-                usedWords[i] = true;
-                solve(pathIdx + 1);
-                
-                // Backtrack
-                usedWords[i] = false;
-                for (let j = 0; j < len; j++) {
-                    grid[dir === 'H' ? r : r + j][dir === 'H' ? c + j : c] = originalChars[j];
-                }
-                if (solutions.length > 1) return; 
+            usedWords[i] = true;
+            solve(pathIdx + 1);
+            if (solutions.length > 1) return; // Optimization: Abort early if not unique
+
+            // Backtrack state
+            usedWords[i] = false;
+            for (let j = 0; j < path.len; j++) {
+                const currR = path.dir === 'H' ? path.r : path.r + j;
+                const currC = path.dir === 'H' ? path.c + j : path.c;
+                grid[currR][currC] = originalChars[j];
             }
         }
     }
-        solve(0);
 
-    if (solutions.length !== 1) {
-        console.log('Error');
-    } else {
-        console.log(solutions[0]);
-    }
-    
-} 
-const emptyPuzzle = `2001
-0..0
-1000
-0..0`;
-const words = ["casa", "alan", "ciao", "anta"];
-
-crosswordSolver(emptyPuzzle, words);
+    solve(0);
+    return solutions;
+}
