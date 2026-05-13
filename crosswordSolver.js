@@ -105,3 +105,21 @@ function runBacktrackingSolver(grid, paths, words) {
     solve(0);
     return solutions;
 }
+function crosswordSolver(emptyPuzzle, words) {
+    const parsedData = parseAndValidatePuzzle(emptyPuzzle, words);
+    if (!parsedData) {
+        console.log('Error');
+        return;
+    }
+
+    const { grid, height, width } = parsedData;
+    const paths = detectWordPaths(grid, height, width);
+
+    const solutions = runBacktrackingSolver(grid, paths, words);
+
+    if (solutions.length !== 1) {
+        console.log('Error');
+    } else {
+        console.log(solutions[0]);
+    }
+}
