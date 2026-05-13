@@ -23,17 +23,20 @@ function parseAndValidatePuzzle(emptyPuzzle, words) {
 
     
     //logic for path detection
+   function detectWordPaths(grid, height, width) {
     const paths = [];
     for (let r = 0; r < height; r++) {
         for (let c = 0; c < width; c++) {
             if (grid[r][c] === '.') continue;
 
+            // Horizontal Path Detection
             if (c === 0 || grid[r][c - 1] === '.') {
                 let len = 0;
                 while (c + len < width && grid[r][c + len] !== '.') len++;
                 if (len >= 2) paths.push({ r, c, len, dir: 'H' });
             }
 
+            // Vertical Path Detection
             if (r === 0 || grid[r - 1][c] === '.') {
                 let len = 0;
                 while (r + len < height && grid[r + len][c] !== '.') len++;
@@ -41,6 +44,8 @@ function parseAndValidatePuzzle(emptyPuzzle, words) {
             }
         }
     }
+    return paths;
+}
 
 //implement recursive solver with backtracking
     const solutions = [];
